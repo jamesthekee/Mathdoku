@@ -1,0 +1,57 @@
+.game-grid {
+    -fx-background-color: black, white;
+    -fx-padding: 0;
+    -fx-background-insets: 0, 1 1 1 1;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+}
+
+
+.game-grid-cell {
+    -fx-background-color: black, white;
+    -fx-border-width: 1;
+}
+
+.game-grid-incorrect-cell {
+    -fx-background-color: black, red;
+    -fx-border-width: 1;
+}
+
+.cage-label-small{
+    -fx-padding: 5 0 0 5;
+    -fx-font-family: "consolas";
+    -fx-font-size: 12;
+}
+
+.cage-label-medium{
+    -fx-padding: 0 0 0 4;
+    -fx-font-family: "consolas";
+    -fx-font-size: 24;
+}
+
+.cage-label-large{
+    -fx-padding: 0 0 0 4;
+    -fx-font-family: "consolas";
+    -fx-font-size: 40;
+}
+
+.cell-label-small{
+    -fx-font-family: "consolas";
+    -fx-font-size: 32;
+}
+
+.cell-label-medium{
+    -fx-font-family: "consolas";
+    -fx-font-size: 80;
+}
+
+.cell-label-large{
+    -fx-font-family: "consolas";
+    -fx-font-size: 96;
+}
+
+.text-field{
+    -fx-font-family: "consolas";
+    -fx-font-size: 16;
+}
+
