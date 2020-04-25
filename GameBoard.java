@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -99,7 +97,7 @@ class GameBoard {
         }
     }
 
-    private boolean recursiveSolve(int index){
+    private boolean recursiveSolve(int index) {
         for(int i=1; i<=n; i++){
             cells[index].value = i;
             if(quickCheck()){
@@ -113,7 +111,6 @@ class GameBoard {
                 else if(index == n*n -1)
                     return true;
             }
-
         }
         return false;
     }
@@ -171,8 +168,8 @@ class GameBoard {
         Set<Integer> curRowSet;
         Set<Integer> curColSet;
         for(int i=0; i<n; i++){
-            curColSet = new HashSet<>();
-            curRowSet = new HashSet<>();
+            curColSet = new HashSet<Integer>();
+            curRowSet = new HashSet<Integer>();
 
             // Check each col
             for(int k=0; k<n; k++){
@@ -298,6 +295,7 @@ class GameBoard {
             cage.showLabel(cells);
             cage.showWalls(cells);
         }
+
     }
 
     void setFont(int size){

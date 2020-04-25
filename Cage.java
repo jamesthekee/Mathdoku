@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -26,6 +24,10 @@ class Cage {
         this.n = n;
         this.walls = new boolean[cellIndexes.length][4];
         calcWalls();
+    }
+
+    public String toString(){
+        return Arrays.toString(cellIndexes);
     }
 
     void setIncorrect(Cell[] cells){
@@ -62,7 +64,7 @@ class Cage {
 
     boolean correctValues(Cell[] cells){
         int total = 0;
-        int[] values;
+        int max;
         switch(op){
             case NONE:
                 return cells[cellIndexes[0]].value == value;
@@ -79,30 +81,27 @@ class Cage {
                 return total == value;
 
             case SUBTRACT:
-                values = new int[cellIndexes.length];
-                for(int i=0; i<cellIndexes.length; i++)
-                    values[i] = cells[cellIndexes[i]].value;
-
-                Arrays.sort(values);
-                for(int i=0; i<cellIndexes.length-1; i++)
-                    total += values[i];
-                return values[values.length-1]-total == value;
+                max = 0;
+                for(int i: cellIndexes) {
+                    total += cells[i].value;
+                    if(cells[i].value > max){
+                        max = cells[i].value;
+                    }
+                }
+                return 2*max - total == value;
 
             case DIVIDE:
-                values = new int[cellIndexes.length];
-                for(int i=0; i<cellIndexes.length; i++)
-                    values[i] = cells[cellIndexes[i]].value;
-
-                Arrays.sort(values);
-
-                total = values[values.length-1];
-                for(int i=values.length-2; i>=0; i--){
-                    int temp = values[i];
-                    if(temp == 0)
+                total = 1;
+                max = 0;
+                for(int i: cellIndexes){
+                    if(cells[i].value == 0)
                         return false;
-                    total /= temp;
+                    total *= cells[i].value;
+                    if(cells[i].value > max){
+                        max = cells[i].value;
+                    }
                 }
-                return total == value;
+                return max*max/total == value;
         }
         return false;
     }
@@ -139,10 +138,10 @@ class Cage {
                 contents += "-";
                 break;
             case MULTIPLY:
-                contents += "×";
+                contents += "\u00D7";
                 break;
             case DIVIDE:
-                contents += "÷";
+                contents += '\u00F7';
                 break;
         }
         return contents;

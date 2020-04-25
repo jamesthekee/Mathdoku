@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -16,10 +14,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,13 +58,21 @@ public class Mathdoku extends Application {
         layout.setHgap(0);
         layout.setVgap(5);
 
+        createMenus();
+        createBottomPanel();
+        createInputPanel();
+
+        setConstraints();
+    }
+
+    private void createMenus(){
         // Create menu bar
         MenuBar menubar = new MenuBar();
         layout.add(menubar, 0, 0, 5, 1);
 
 
         //  Create new game submenu
-        Menu menufile = new Menu("New game");
+        Menu menufile = new Menu("Load game");
         MenuItem loadFromFile = new MenuItem("Load game from file");
         MenuItem loadFromText = new MenuItem("Load game from text");
         menufile.getItems().addAll(loadFromFile, loadFromText);
@@ -77,6 +80,37 @@ public class Mathdoku extends Application {
         // New game menu functions
         loadFromFile.setOnAction(actionEvent -> loadFromFile());
         loadFromText.setOnAction(actionEvent -> loadFromText());
+
+
+        // Create generate menu
+        Menu generate = new Menu("Generate");
+
+        for(int i=2; i<=8; i++){
+            int finalI = i;
+            MenuItem tempGen = new MenuItem(String.format("Generate %dx%d Mathdoku", i, i));
+            tempGen.setOnAction(actionEvent -> generateMathdoku(finalI));
+            generate.getItems().add(tempGen);
+        }
+
+        MenuItem customGen = new MenuItem("Custom size generate");
+        generate.getItems().add(customGen);
+
+        customGen.setOnAction(actionEvent -> {
+            TextInputDialog dialog = new TextInputDialog("8");
+            dialog.setTitle("Generate settings");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Size:");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(name -> {
+                try {
+                    int size = Integer.parseInt(name);
+                    generateMathdoku(size);
+                } catch (NumberFormatException e){
+                    System.err.println("Invalid size");
+                }
+            });
+        });
 
 
         // Create font submenu
@@ -91,7 +125,6 @@ public class Mathdoku extends Application {
         mediumFont.setOnAction(actionEvent -> gameBoard.setFont(2));
         largeFont.setOnAction(actionEvent -> gameBoard.setFont(3));
 
-
         // Create help submenu
         Menu helpMenu = new Menu("Help");
         MenuItem hint = new MenuItem("Give hint");
@@ -101,9 +134,21 @@ public class Mathdoku extends Application {
         solve.setOnAction(actionEvent -> gameBoard.solve());
         hint.setOnAction(actionEvent -> gameBoard.hint());
 
-        menubar.getMenus().addAll(menufile, menuFont, helpMenu);
+        menubar.getMenus().addAll(menufile, generate, menuFont, helpMenu);
+    }
 
+    private void generateMathdoku(int n){
+        Generate gen = new Generate();
+        Cage[] newCages = gen.generate(n);
 
+        overlay.getChildren().remove(gameGrid);
+        gameGrid = new GridPane();
+        GridPane.setHalignment(gameGrid, HPos.CENTER);
+        overlay.getChildren().add(gameGrid);
+        this.gameBoard = new GameBoard(gameGrid, this, n, newCages);
+    }
+
+    private void createBottomPanel(){
         // Credit text
         Text credit = new Text("A Mathdoku game by James Kee");
         GridPane.setHalignment(credit, HPos.RIGHT);
@@ -142,7 +187,9 @@ public class Mathdoku extends Application {
         GridPane.setValignment(redoButton, VPos.BOTTOM);
         GridPane.setValignment(clear, VPos.BOTTOM);
         GridPane.setValignment(showMistakes, VPos.BOTTOM);
+    }
 
+    private void createInputPanel(){
         // Auxillary input panel on the left
         VBox inputPanel = new VBox(5);
         for(int i=1; i<=9; i++){
@@ -161,8 +208,6 @@ public class Mathdoku extends Application {
 
         layout.add(inputPanel, 4, 1, 1, 2);
         GridPane.setHalignment(inputPanel, HPos.CENTER);
-
-        setConstraints();
     }
 
     private void loadFromFile(){
@@ -179,7 +224,7 @@ public class Mathdoku extends Application {
         if(selectedFile != null) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(selectedFile));
-                ArrayList<String> arr = new ArrayList<>();
+                ArrayList<String> arr = new ArrayList<String>();
 
                 String line = br.readLine();
                 while (line != null) {
@@ -275,7 +320,7 @@ public class Mathdoku extends Application {
                     operator = Operator.MULTIPLY;
                     break;
                 case "/":
-                case "÷":
+                case "\u00F7":
                     operator = Operator.DIVIDE;
                     break;
                 case "":
@@ -304,7 +349,7 @@ public class Mathdoku extends Application {
         }
 
         // Check cell indexes are valid, and are uniquely assigned to cages
-        Set indexes = new HashSet<Integer>();
+        Set<Integer> indexes = new HashSet<Integer>();
         int count = 0;
         int highest = Integer.MIN_VALUE;
         for(int[] list: cageCellIndexes){
@@ -334,7 +379,7 @@ public class Mathdoku extends Application {
         int n = (int) sqr;
 
 
-        Set connectedCells;
+        Set<Integer> connectedCells;
         for(int[] list: cageCellIndexes) {
             connectedCells = new HashSet<Integer>();
             for (int a=0; a<list.length-1; a++) {
@@ -344,6 +389,7 @@ public class Mathdoku extends Application {
                 for(int b=a+1; b<list.length; b++){
                     if(list[b] == list[a] + n){
                         downAdjacent = true;
+                        break;
                     }
                 }
 
