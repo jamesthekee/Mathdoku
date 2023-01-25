@@ -1,6 +1,6 @@
 # Mathdoku
 
-![plot](.mathdoku.png)
+![plot](mathdoku.png)
 
 
 
